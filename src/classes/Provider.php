@@ -210,6 +210,11 @@ class Provider
         return $path;
     }
 
+	 /**
+	  * Get path of small image - if not exists, render
+	  * @param type $file	Path of original file
+	  * @return type
+	  */
     public static function small($file)
     {
         require_once dirname(__FILE__).'/../phpthumb/phpthumb.class.php';
@@ -219,39 +224,48 @@ class Provider
         $webimg = dirname($basepath) . "/" . $basefile->name . "_small." . $basefile->extension;
 
         list($x,$y) = getimagesize($file);
-        if($x <= 1200 && $y <= 1200){
+        if($x <= Settings::$small_size && $y <= Settings::$small_size){
             return $file;
         }
 
-        $path = File::r2a($webimg, Settings::$thumbs_dir);
+		  if(Settings::$resize_original_to_small){
+			  $path = $file;
+			  self::renderSmall($file, $path);
+		  } else {
+				$path = File::r2a($webimg, Settings::$thumbs_dir);
 
-        /// Create smaller image
-        if (!file_exists($path) || filectime($file) > filectime($path)) {
+				/// Create smaller image
+				if (!file_exists($path) || filectime($file) > filectime($path)) {
 
-            if (!file_exists(dirname($path))) {
-                @mkdir(dirname($path),0755,true);
-            }
+					 if (!file_exists(dirname($path))) {
+						  @mkdir(dirname($path),0755,true);
+					 }
 
-            $thumb = new phpthumb();
-            $thumb->config_imagemagick_path = Settings::$imagemagick_path;
-            $thumb->setSourceData(file_get_contents($file));
-            $thumb->CalculateThumbnailDimensions();
-            $thumb->w = 1200;
-            $thumb->h = 1200;
-            $thumb->q = Settings::$quality_small;
-
-            if (File::Type($file) == 'Image' && Provider::get_orientation_degrees($file) != 0) {
-                $thumb->SourceImageToGD();
-                //$thumb->ra = Provider::get_orientation_degrees($file);
-                $thumb->Rotate();
-            }
-
-            $thumb->GenerateThumbnail();
-            $thumb->RenderToFile($path);
-        }
+					 self::renderSmall($file, $path);
+				}
+		  }
 
         return $path;
     }
+	 
+	 private static function renderSmall($file, $path){
+		$thumb = new phpthumb();
+		$thumb->config_imagemagick_path = Settings::$imagemagick_path;
+		$thumb->setSourceData(file_get_contents($file));
+		$thumb->CalculateThumbnailDimensions();
+		$thumb->w = Settings::$small_size;
+		$thumb->h = Settings::$small_size;
+		$thumb->q = Settings::$quality_small;
+
+		if (File::Type($file) == 'Image' && Provider::get_orientation_degrees($file) != 0) {
+			 $thumb->SourceImageToGD();
+			 //$thumb->ra = Provider::get_orientation_degrees($file);
+			 $thumb->Rotate();
+		}
+
+		$thumb->GenerateThumbnail();
+		$thumb->RenderToFile($path);
+	 }
 
 	/**
 	 * Provide an image to the user, if he is allowed to

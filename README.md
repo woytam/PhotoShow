@@ -1,4 +1,4 @@
-# PhotoShow 3.0
+# PhotoShow Woytam 3.0.1
 
 ## Website
 

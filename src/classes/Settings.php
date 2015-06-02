@@ -139,7 +139,13 @@ class Settings extends Page
 
 	/// Size of the thumbs in pixels
 	static public $thumbs_size = 200;
-
+	
+	/// Size of the thumbs in pixels
+	static public $small_size = 1200;
+	
+	/// Size of the thumbs in pixels
+	static public $resize_original_to_small = false;
+	
 	/*** Video ***/
 	
 	///Video encode enable/disable
@@ -204,6 +210,14 @@ class Settings extends Page
 			Settings::$quality_mini = $config->quality_mini;
 		}
 
+		if (isset($config->resize_original_to_small)) {
+			Settings::$resize_original_to_small = $config->resize_original_to_small;
+		}
+		
+		if (isset($config->small_size)) {
+			Settings::$small_size = $config->small_size;
+		}
+		
 		/// Set TimeZone
 		date_default_timezone_set($config->timezone);
 
@@ -490,6 +504,7 @@ class Settings extends Page
 					<label>".Settings::_("settings","thumbs_size")."</label>
 					<input type='text' name='max_img_dir' value=\"".htmlentities(Settings::$thumbs_size, ENT_QUOTES ,'UTF-8')."\">
 				</div>\n";
+		echo "<p>Size of small image, quality and resizing original image is set in config.php</p>";
 
 		echo "<h2>Social Networks</h2>";
 

@@ -38,6 +38,20 @@ $config->photos_dir   = "path_to_your_photos_dir_goes_here";
 $config->ps_generated   = "path_where_photoshow_generates_files_goes_here";
 
 // Local timezone. Default one is "Europe/Paris".
-#$config->timezone = "Europe/Paris";
+//$config->timezone = "Europe/Paris";
 
-?>
+// Path to imageMagick
+// $config->imagemagick_path = '/usr/local/bin/convert';
+
+// Quality of thumbs
+// $config->quality_mini = 90
+
+// Quality of small image
+$config->quality_small = 90;
+
+// Size of small image
+$config->small_size = 1200;
+
+// If resize original image to small
+// ATTENTION! It will CHANGE the ORIGINAL image
+$config->resize_original_to_small = FALSE;
