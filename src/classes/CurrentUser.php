@@ -300,6 +300,8 @@ class CurrentUser
 		if(isset(CurrentUser::$account)){
 			CurrentUser::$admin = in_array("root",CurrentUser::$account->groups);
 		}
+		
+		session_write_close();		// Possible performance improvement
 	}
 
 	/**

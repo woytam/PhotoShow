@@ -119,7 +119,17 @@ class JS extends Page
 				case "Comm":	$f = new Comments(CurrentUser::$path);
 								$f->toHTML();
 								break;
-
+							
+				case "GAJ":	echo json_encode(Menu::list_files(File::r2a(stripslashes($_GET['path'])),true));
+								break;
+									
+				case "GFJ": /// Generate thumb
+								Provider::image($_GET['file'],true,false,false);
+								/// Generate webimg
+								Provider::image($_GET['file'],false,false,false);
+								echo 'OK';
+								break;
+							
 				default:		break;
 			}
 		}

@@ -549,22 +549,87 @@ class Settings extends Page
 		echo "</form>\n";
 
 
-		echo "<div class='section'><h2>".Settings::_("settings","generate")."</h2>";
+?>
+<div class='section'><h2><?php echo Settings::_("settings","generate"); ?> </h2>
+	<form class='niceform pure-form' action='?t=Adm&a=GAl' method='post'>
+		<fieldset>
+			<label><?php echo Settings::_("settings","folder"); ?></label>
+			<select name='path' id="path">
+				<option value='.'><?php echo Settings::_("settings","all"); ?></option>
+			<?php
+			$foldersAll = array();
+			foreach($this->folders as $f){
+				$p = htmlentities(File::a2r($f), ENT_QUOTES ,'UTF-8');
+				echo "<option value=\"".addslashes($p)."\">".basename($p)."</option>";
+				$foldersAll[] = $p;
+			} ?>
+			</select>
+			<input id="generate-button" type='submit' class='pure-button pure-button-primary' value='<?php echo Settings::_("settings","submit"); ?>'/>
+		</fieldset>
+	</form>
+	<p id="generate-info"></p>
+	<p id="generate-error"></p>
+	<script type="text/javascript">
+var files;
+var currPosition = -1;
 
-		echo "<form class='niceform pure-form' action='?t=Adm&a=GAl' method='post'>\n";
-		echo "<fieldset>
-					<label>".Settings::_("settings","folder")."</label>
-					<select name='path'>";
-		echo "<option value='.'>".Settings::_("settings","all")."</option>";
-		foreach($this->folders as $f){
-			$p = htmlentities(File::a2r($f), ENT_QUOTES ,'UTF-8');
-			echo "<option value=\"".addslashes($p)."\">".basename($p)."</option>";
+	function showInfo(){
+		$("#generate-info").html('Generating... ' + currPosition + '/' + files.length + "<br />" + files[currPosition]);
+	}
+
+	function ajaxGenerate(){
+		currPosition++;
+		if(files.length <= currPosition){
+			return false;
 		}
-		echo "</select>";
-		echo "<input type='submit' class='pure-button pure-button-primary' value='".Settings::_("settings","submit")."'/>\n";
-		echo "</fieldset>";
-		echo "</form>";
-		echo "</div>";
+		showInfo();
+		var jqxhr = $.ajax({
+			method: "GET",
+			data: { j: 'GFJ', file: files[ currPosition ] }
+		})
+			.done(function( msg ) {
+				console.log(msg);
+			})
+			.fail(function( msg, textStatus) {
+			  $("#generate-error").append('<br />ERROR(' + currPosition + '/' + files.length + ' ' + files[currPosition] + '): ' + textStatus);
+			})
+			.always(function() {
+				ajaxGenerate();
+			});
+}
+$("document").ready(function(){
+
+	// On clicking an submit generate button
+	$("#generate-button").click(function( event ){
+		event.preventDefault();
+		/*console.log(foldersAll);
+		for ( var i = 0, l = foldersAll.length; i < l; i++ ) {
+			 $("#generate-list").append('<li>' + foldersAll[ i ] + '</li>') ;
+		}*/
+		
+		files = '';
+		currPosition = -1;
+		
+		var jqxhr = $.ajax({
+			method: "GET",
+			data: { j: 'GAJ', path: $('#path').val() }
+		})
+			.done(function( msg ) {
+				files = $.parseJSON(msg);
+				showInfo();
+				console.log(files);
+				ajaxGenerate();
+			})
+			.fail(function() {
+			  alert( "error" );
+			});
+		
+		return false;
+	});
+});
+	</script>
+</div>
+<?php
 	}
 }
 ?>

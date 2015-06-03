@@ -33,9 +33,9 @@
 session_start();
 
 /// Because we don't care about notices
-if(function_exists("error_reporting")){
-	error_reporting(E_ERROR | E_WARNING);
-}
+//if(function_exists("error_reporting")){
+//	error_reporting(E_ERROR | E_WARNING);
+//}
 
 /// Autoload classes
 function my_autoload($class){

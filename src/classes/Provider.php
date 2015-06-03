@@ -53,7 +53,7 @@ class Provider
 	{
 		if (in_array("exif", get_loaded_extensions()))
 		{
-			$raw_exif = @exif_read_data ($filename);
+			$raw_exif = exif_read_data ($filename);
 			switch ($raw_exif['Orientation'])
 			{
 				case 1:
@@ -77,6 +77,7 @@ class Provider
 			}
 		}else{
 			$degrees = 0;
+			error_log('No EXIF extension');
 		}
 
 		return $degrees;
@@ -192,7 +193,7 @@ class Provider
 
             if (File::Type($file) == 'Image' && Provider::get_orientation_degrees($file) != 0) {
                 $thumb->SourceImageToGD();
-                //$thumb->ra = Provider::get_orientation_degrees($file);
+                $thumb->ar = 'x';
                 $thumb->Rotate();
             }
 
@@ -259,7 +260,7 @@ class Provider
 
 		if (File::Type($file) == 'Image' && Provider::get_orientation_degrees($file) != 0) {
 			 $thumb->SourceImageToGD();
-			 //$thumb->ra = Provider::get_orientation_degrees($file);
+			 $thumb->ar = 'x';
 			 $thumb->Rotate();
 		}
 
@@ -324,7 +325,7 @@ class Provider
         }
 
         if($output){
-			if($dl){
+			/*if($dl){
 				header('Content-Disposition: attachment; filename="'.basename($file).'"');
 			}else{
 				$expires = 60*60*24*14;
@@ -340,21 +341,53 @@ class Provider
 				header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expires) . ' GMT');
 			}
 
-	        header('Content-type: image/jpeg');
+	        header('Content-type: image/jpeg');*/
+			  session_write_close();		// Possible performance improvement
             if(File::Type($path)=="Image"){
-            	readfile($path);
+            	self::readfile($path, $dl);
             	return;
-                try {
+               /* try {
                     imagejpeg(Provider::autorotate_jpeg ($path));	
                 }catch(Exception $e){
                     error_log('ERROR/Provider.php: cannot rotate '.$path.': '.$e);
                     readfile($path);
-                }
+                }*/
             }else{
-                readfile($path);
+                self::readfile($path, $dl);
             }
         }
     }
+	 
+	 private static function readfile($file, $dl = FALSE){
+
+			
+			//if(in_array('mod_xsendfile', apache_get_modules())){
+			if( FALSE ){	//Apache module xSendFile - not tested
+		 		header("X-Sendfile: $file");
+				header('Content-type: image/jpeg');
+				if($dl)
+					header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+				exit;
+			} else {		//Standard readfile
+				header('Content-type: image/jpeg');
+				if($dl){
+					header('Content-Disposition: attachment; filename="'.basename($file).'"');
+				}else{
+					$expires = 60*60*24*14;
+					//$last_modified_time = filemtime($file); 
+					//$last_modified_time = 0;
+					$etag = md5_file($file); 
+
+					header("Last-Modified: " . 0 . " GMT");
+					header("Pragma: public");
+					header("Cache-Control: max-age=360000");
+					header("Etag: $etag"); 
+					header("Cache-Control: maxage=".$expires);
+					header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expires) . ' GMT');
+				}
+				readfile($file);
+			}
+	 }
 
 	/**
 	 * Generates a zip.
