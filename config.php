@@ -52,6 +52,10 @@ $config->quality_small = 90;
 // Size of small image
 $config->small_size = 1200;
 
+// If serve image files via header X-SENDFILE with mod_xsendfile Apache module
+// Do not forget to set XSendFilePath and XSendFile On in your VirtualHost configuration
+//$config->mod_xsendfile = FALSE;
+
 // If resize original image to small
 // ATTENTION! It will CHANGE the ORIGINAL image
 $config->resize_original_to_small = FALSE;

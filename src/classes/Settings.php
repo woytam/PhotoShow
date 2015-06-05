@@ -65,8 +65,10 @@ class Settings extends Page
 
 	/// Quality of mini thumbnails in overview, scala: 0-100
 	static public $quality_mini = 90;
+	
+	static public $mod_xsendfile = FALSE;
 
-
+	
 	/**** Admin Settings ****/
 
 	/// Website name
@@ -216,6 +218,10 @@ class Settings extends Page
 		
 		if (isset($config->small_size)) {
 			Settings::$small_size = $config->small_size;
+		}
+		
+		if (isset($config->mod_xsendfile)) {
+			Settings::$mod_xsendfile = $config->mod_xsendfile;
 		}
 		
 		/// Set TimeZone

@@ -359,10 +359,8 @@ class Provider
     }
 	 
 	 private static function readfile($file, $dl = FALSE){
-
-			
 			//if(in_array('mod_xsendfile', apache_get_modules())){
-			if( FALSE ){	//Apache module xSendFile - not tested
+			if( Settings::$mod_xsendfile ){	//Apache module xSendFile - not tested
 		 		header("X-Sendfile: $file");
 				header('Content-type: image/jpeg');
 				if($dl)
