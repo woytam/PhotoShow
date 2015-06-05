@@ -77,7 +77,7 @@ class Board implements HTMLObject
 	 * @author Thibaud Rohmer
 	 */
 	public function __construct($path=NULL){
-		
+
 		if(!isset($path)){
 			$path = CurrentUser::$path;
 		}
@@ -125,6 +125,8 @@ class Board implements HTMLObject
                 if ( $i > 9){
                     break;
                 }
+					 if(!Judge::view($d))	//Dir is not accessible (rights) - performance 
+						 continue;
                 $img = Judge::searchDir($d, true);
                 if ($img)
                 {
@@ -170,6 +172,8 @@ class Board implements HTMLObject
 	 */
 	private function foldergrid(){
 		foreach($this->dirs as $d){
+			if(!Judge::view($d))	//Dir is not accessible (rights) - performance 
+				continue;
 			$firstImg = Judge::searchDir($d);
 			if(!$firstImg){
 				if(CurrentUser::$admin){
